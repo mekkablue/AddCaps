@@ -4,20 +4,22 @@ from __future__ import division, print_function, unicode_literals
 ###########################################################################################################
 #
 #
-#	Filter without dialog Plugin
+# Filter without dialog Plugin
 #
-#	Read the docs:
-#	https://github.com/schriftgestalt/GlyphsSDK/tree/master/Python%20Templates/Filter%20without%20Dialog
+# Read the docs:
+# https://github.com/schriftgestalt/GlyphsSDK/tree/master/Python%20Templates/Filter%20without%20Dialog
 #
 #
 ###########################################################################################################
 
 import objc
-from GlyphsApp import *
-from GlyphsApp.plugins import *
+from GlyphsApp import Glyphs, GSHint, CAP, Message
+from GlyphsApp.plugins import FilterWithoutDialog
+from AppKit import NSPoint
+
 
 class AddCaps(FilterWithoutDialog):
-	
+
 	@objc.python_method
 	def addCapToNodeInLayer(self, layer, node, capName):
 		# add caps if present in font:
@@ -28,14 +30,14 @@ class AddCaps(FilterWithoutDialog):
 			cap.type = CAP
 			cap.name = capName
 			cap.originNode = node
-			cap.setOptions_(3) # fit
+			cap.setOptions_(3)  # fit
 			layer.addHint_(cap)
-	
+
 	@objc.python_method
 	def settings(self):
 		self.menuName = "Add Caps"
-		self.keyboardShortcut = None # With Cmd+Shift
-	
+		self.keyboardShortcut = None  # With Cmd+Shift
+
 	@objc.python_method
 	def filter(self, layer, inEditView, customParameters):
 		if inEditView:
@@ -45,22 +47,22 @@ class AddCaps(FilterWithoutDialog):
 					"Styles" if Glyphs.versionNumber >= 3.0 else "Instances",
 				),
 				OKButton=None,
-				)
+			)
 		else:
 			try:
 				capName = customParameters["cap"]
-				for i,x in enumerate(customParameters):
+				for i, x in enumerate(customParameters):
 					if x != "cap":
 						pointInfo = customParameters[x].split(",")
 						if len(pointInfo) != 2:
-							print( u"%s: Invalid point coordinate: '%s'" % (layer.parent.name, pointInfo) )
+							print(u"%s: Invalid point coordinate: '%s'" % (layer.parent.name, pointInfo))
 						else:
-							xInfo = pointInfo[0].strip().replace("width","%.1f"%layer.width)
-							yInfo = pointInfo[1].strip().replace("width","%.1f"%layer.width)
-							x=eval(xInfo)
-							y=eval(yInfo)
-						
-							capNodePosition = NSPoint(x,y)
+							xInfo = pointInfo[0].strip().replace("width", "%.1f" % layer.width)
+							yInfo = pointInfo[1].strip().replace("width", "%.1f" % layer.width)
+							x = eval(xInfo)
+							y = eval(yInfo)
+
+							capNodePosition = NSPoint(x, y)
 							if capNodePosition:
 								try:
 									# GLYPHS 3
@@ -77,16 +79,14 @@ class AddCaps(FilterWithoutDialog):
 										None,
 										10,
 									)
-								
 								self.addCapToNodeInLayer(layer, node, capName)
 							else:
-								print( u"%s: Could not find a node close to %i, %i" % (layer.parent.name, x, y) )
+								print(u"%s: Could not find a node close to %i, %i" % (layer.parent.name, x, y))
 			except Exception as e:
 				import traceback
-				print( traceback.format_exc() )
-	
+				print(traceback.format_exc())
+
 	@objc.python_method
 	def __file__(self):
 		"""Please leave this method unchanged"""
 		return __file__
-	
