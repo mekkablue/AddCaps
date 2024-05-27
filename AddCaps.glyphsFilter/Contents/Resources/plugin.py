@@ -64,27 +64,28 @@ class AddCaps(FilterWithoutDialog):
 				yInfo = pointInfo[1].strip().replace("width", "%.1f" % layer.width)
 				x = eval(xInfo)
 				y = eval(yInfo)
+				if not isinstance(x, (int, float)) or not isinstance(y, (int, float)):
+					print(u"%s: Could not find a node close to %i, %i" % (layer.parent.name, x, y))
+					continue
 
 				capNodePosition = NSPoint(x, y)
-				if capNodePosition:
-					try:
-						# GLYPHS 3
-						node = layer.nodeAtPoint_excludeNode_ignoreLocked_tolerance_(
-							capNodePosition,
-							None,
-							True,
-							10,
-						)
-					except:
-						# GLYPHS 2
-						node = layer.nodeAtPoint_excludeNode_tollerance_(
-							capNodePosition,
-							None,
-							10,
-						)
-					self.addCapToNodeInLayer(layer, node, capName)
-				else:
-					print(u"%s: Could not find a node close to %i, %i" % (layer.parent.name, x, y))
+				try:
+					# GLYPHS 3
+					node = layer.nodeAtPoint_excludeNode_ignoreLocked_tolerance_(
+						capNodePosition,
+						None,
+						True,
+						10,
+					)
+				except:
+					# GLYPHS 2
+					node = layer.nodeAtPoint_excludeNode_tollerance_(
+						capNodePosition,
+						None,
+						10,
+					)
+				self.addCapToNodeInLayer(layer, node, capName)
+			
 		except Exception as e:
 			import traceback
 			print(traceback.format_exc())
