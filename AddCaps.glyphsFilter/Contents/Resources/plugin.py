@@ -48,43 +48,46 @@ class AddCaps(FilterWithoutDialog):
 				),
 				OKButton=None,
 			)
-		else:
-			try:
-				capName = customParameters["cap"]
-				for i, x in enumerate(customParameters):
-					if x != "cap":
-						pointInfo = customParameters[x].split(",")
-						if len(pointInfo) != 2:
-							print(u"%s: Invalid point coordinate: '%s'" % (layer.parent.name, pointInfo))
-						else:
-							xInfo = pointInfo[0].strip().replace("width", "%.1f" % layer.width)
-							yInfo = pointInfo[1].strip().replace("width", "%.1f" % layer.width)
-							x = eval(xInfo)
-							y = eval(yInfo)
+			return
+		try:
+			capName = customParameters["cap"]
+			for i, x in enumerate(customParameters):
+				if x == "cap":
+					continue
 
-							capNodePosition = NSPoint(x, y)
-							if capNodePosition:
-								try:
-									# GLYPHS 3
-									node = layer.nodeAtPoint_excludeNode_ignoreLocked_tolerance_(
-										capNodePosition,
-										None,
-										True,
-										10,
-									)
-								except:
-									# GLYPHS 2
-									node = layer.nodeAtPoint_excludeNode_tollerance_(
-										capNodePosition,
-										None,
-										10,
-									)
-								self.addCapToNodeInLayer(layer, node, capName)
-							else:
-								print(u"%s: Could not find a node close to %i, %i" % (layer.parent.name, x, y))
-			except Exception as e:
-				import traceback
-				print(traceback.format_exc())
+				pointInfo = customParameters[x].split(",")
+				if len(pointInfo) != 2:
+					print(u"%s: Invalid point coordinate: '%s'" % (layer.parent.name, pointInfo))
+					continue
+
+				xInfo = pointInfo[0].strip().replace("width", "%.1f" % layer.width)
+				yInfo = pointInfo[1].strip().replace("width", "%.1f" % layer.width)
+				x = eval(xInfo)
+				y = eval(yInfo)
+
+				capNodePosition = NSPoint(x, y)
+				if capNodePosition:
+					try:
+						# GLYPHS 3
+						node = layer.nodeAtPoint_excludeNode_ignoreLocked_tolerance_(
+							capNodePosition,
+							None,
+							True,
+							10,
+						)
+					except:
+						# GLYPHS 2
+						node = layer.nodeAtPoint_excludeNode_tollerance_(
+							capNodePosition,
+							None,
+							10,
+						)
+					self.addCapToNodeInLayer(layer, node, capName)
+				else:
+					print(u"%s: Could not find a node close to %i, %i" % (layer.parent.name, x, y))
+		except Exception as e:
+			import traceback
+			print(traceback.format_exc())
 
 	@objc.python_method
 	def __file__(self):
