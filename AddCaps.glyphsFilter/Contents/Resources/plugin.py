@@ -51,11 +51,11 @@ class AddCaps(FilterWithoutDialog):
 			return
 		try:
 			capName = customParameters["cap"]
-			for i, x in enumerate(customParameters):
+			for x, pointInfo in customParameters.items():
 				if x == "cap":
 					continue
 
-				pointInfo = customParameters[x].split(",")
+				pointInfo = pointInfo.split(",")
 				if len(pointInfo) != 2:
 					print(u"%s: Invalid point coordinate: '%s'" % (layer.parent.name, pointInfo))
 					continue
