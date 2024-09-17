@@ -85,10 +85,10 @@ class AddCaps(FilterWithoutDialog):
 						10,
 					)
 				self.addCapToNodeInLayer(layer, node, capName)
-			
+
 		except Exception as e:
 			import traceback
-			print(traceback.format_exc())
+			print(traceback.format_exc(), e)
 
 	@objc.python_method
 	def __file__(self):
